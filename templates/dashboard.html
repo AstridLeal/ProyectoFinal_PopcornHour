@@ -13,9 +13,13 @@
             <p><strong>Año:</strong> {{ movie.year }}</p>
         </div>
         {% if role == 'standard' %}
-        <!-- Mostrar botones solo si el usuario es estándar -->
         <a href="{{ url_for('routes.movie_detail', movie_id=movie.id) }}" class="btn btn-primary">Calificar</a>
         <a href="{{ url_for('routes.movie_detail', movie_id=movie.id) }}" class="btn btn-secondary">Comentar</a>
+        {% endif %}
+        {% if role == 'moderator' %}
+        <form method="POST" action="{{ url_for('routes.delete_movie', movie_id=movie.id) }}" style="display:inline;">
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
         {% endif %}
     </div>
     {% endfor %}

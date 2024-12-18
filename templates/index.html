@@ -7,26 +7,23 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <!-- Encabezado -->
     <h1>Popcorn Hour</h1>
-
-    <!-- Breve descripción del proyecto -->
     <p>Bienvenido a <strong>Popcorn Hour</strong>, el portal web definitivo para recomendar, calificar y discutir sobre tus películas y series favoritas. 
     <p>Únete a nuestra comunidad y comparte tus opiniones con otros cinéfilos.</p>
 
-    <!-- Opciones para iniciar sesión o registrarse -->
-    <div>
-        <h2>Inicia sesión o regístrate</h2>
-        <p>Selecciona una opción para continuar:</p>
-        <a href="{{ url_for('routes.login') }}">
-            <button class="btn btn-primary">Iniciar sesión</button>
-        </a>
-        <a href="{{ url_for('routes.register') }}">
-            <button class="btn btn-secondary">Registrarse</button>
-        </a>
-    </div>
+    {% if not session.get('user_id') %}
+        <div>
+            <h2>Inicia sesión o regístrate</h2>
+            <p>Selecciona una opción para continuar:</p>
+            <a href="{{ url_for('routes.login') }}">
+                <button class="btn btn-primary">Iniciar sesión</button>
+            </a>
+            <a href="{{ url_for('routes.register') }}">
+                <button class="btn btn-secondary">Registrarse</button>
+            </a>
+        </div>
+    {% endif %}
 
-    <!-- Contenedor principal de películas -->
     <div class="movie-grid">
         {% for movie in movies %}
         <div class="movie-card">
@@ -35,12 +32,13 @@
                 <h2>{{ movie.title }}</h2>
                 <p>{{ movie.genre }}</p>
                 <p>{{ movie.year }}</p>
+                <p>Calificación: {{ movie_ratings[movie.id] }}</p>
+                <a href="{{ url_for('routes.movie_detail', movie_id=movie.id) }}">Ver detalles</a>
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <!-- Opcional: Pie de página -->
     <footer>
         <p>&copy; 2024 Astrid Alexandra Leal Carrillo. Todos los derechos reservados.</p>
     </footer>

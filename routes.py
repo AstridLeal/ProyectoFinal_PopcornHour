@@ -11,7 +11,14 @@ routes = Blueprint('routes', __name__)
 @routes.route('/')
 def index():
     movies = Movie.query.all()
-    return render_template('index.html', movies=movies)
+    movie_ratings = {}
+    for movie in movies:
+        comments = Comment.query.filter_by(movie_id=movie.id).all()
+        ratings = [comment.rating for comment in comments if comment.rating > 0]
+        average_rating = sum(ratings) / len(ratings) if ratings else 0
+        movie_ratings[movie.id] = average_rating
+
+    return render_template('index.html', movies=movies, movie_ratings=movie_ratings)
 
 # Ruta de registro
 @routes.route('/register', methods=['GET', 'POST'])
@@ -108,13 +115,24 @@ def dashboard():
         return redirect(url_for('routes.login'))
 
     movies = Movie.query.all()
-    return render_template('dashboard.html', movies=movies, username=session['username'], role=session['role'])
+    movie_ratings = {}
+    for movie in movies:
+        comments = Comment.query.filter_by(movie_id=movie.id).all()
+        ratings = [comment.rating for comment in comments if comment.rating > 0]
+        average_rating = sum(ratings) / len(ratings) if ratings else 0
+        movie_ratings[movie.id] = average_rating
+
+    return render_template('dashboard.html', movies=movies, movie_ratings=movie_ratings, username=session['username'], role=session['role'])
 
 # Ruta para ver detalles de una película
 @routes.route('/movie/<int:movie_id>', methods=['GET', 'POST'])
 def movie_detail(movie_id):
     movie = Movie.query.get_or_404(movie_id)
     comments = Comment.query.filter_by(movie_id=movie.id, parent_id=None).all()  # Solo comentarios principales
+
+    # Calcular el promedio de calificación
+    ratings = [comment.rating for comment in comments if comment.rating > 0]
+    average_rating = sum(ratings) / len(ratings) if ratings else 0
 
     if 'user_id' in session:
         user_role = session.get('role')
@@ -137,8 +155,21 @@ def movie_detail(movie_id):
             new_comment = Comment(movie_id=movie.id, user_id=session['user_id'], text=comment_text, rating=rating or 0, parent_id=parent_id)
             db.session.add(new_comment)
             db.session.commit()
-            flash('Comentario agregado exitosamente.', 'success')
+            flash('Comentario y calificación agregados exitosamente.', 'success')
 
             return redirect(url_for('routes.movie_detail', movie_id=movie.id))
 
-    return render_template('movie_details.html', movie=movie, comments=comments)
+    return render_template('movie_details.html', movie=movie, comments=comments, average_rating=average_rating, user_id=session.get('user_id'))
+
+# Ruta para eliminar una película (solo para moderadores)
+@routes.route('/delete_movie/<int:movie_id>', methods=['POST'])
+def delete_movie(movie_id):
+    if 'user_id' not in session or session.get('role') != 'moderator':
+        flash('No tienes permisos para eliminar películas.', 'danger')
+        return redirect(url_for('routes.dashboard'))
+
+    movie = Movie.query.get_or_404(movie_id)
+    db.session.delete(movie)
+    db.session.commit()
+    flash(f'Película "{movie.title}" eliminada exitosamente.', 'success')
+    return redirect(url_for('routes.dashboard'))

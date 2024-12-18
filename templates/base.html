@@ -4,17 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PopcornHour</title>
-    <!-- Aquí puedes incluir tus enlaces de CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <nav>
         <ul>
-            <li><a href="{{ url_for('routes.dashboard') }}">Dashboard</a></li>
-            {% if session['role'] == 'moderator' %}
-            <li><a href="{{ url_for('routes.add_movie') }}">Subir Película</a></li>
+            {% if session.get('user_id') %}
+                <li><a href="{{ url_for('routes.dashboard') }}">Dashboard</a></li>
+                {% if session['role'] == 'moderator' %}
+                    <li><a href="{{ url_for('routes.add_movie') }}">Subir Película</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('routes.logout') }}">Cerrar sesión</a></li>
+            {% else %}
+                <li><a href="{{ url_for('routes.login') }}">Iniciar sesión</a></li>
+                <li><a href="{{ url_for('routes.register') }}">Registrarse</a></li>
             {% endif %}
-            <li><a href="{{ url_for('routes.index') }}">Cerrar sesión</a></li>
         </ul>
     </nav>
 

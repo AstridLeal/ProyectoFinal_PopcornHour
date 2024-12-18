@@ -7,6 +7,8 @@
 <p><strong>Año:</strong> {{ movie.year }}</p>
 <img src="{{ movie.image_url }}" alt="{{ movie.title }}" class="movie-image">
 
+<h3>Promedio de Calificación: {{ average_rating|round(1) }} estrellas</h3>
+
 <h3>Comentarios</h3>
 <div class="comments">
     {% for comment in comments %}
@@ -20,7 +22,7 @@
         </div>
         {% endfor %}
         <!-- Formulario para responder -->
-        {% if session['role'] == 'standard' %}
+        {% if session.get('role') == 'standard' %}
         <form method="POST" action="{{ url_for('routes.movie_detail', movie_id=movie.id) }}">
             <textarea name="comment" placeholder="Escribe tu respuesta" required></textarea>
             <input type="hidden" name="parent_id" value="{{ comment.id }}">
@@ -31,7 +33,7 @@
     {% endfor %}
 </div>
 
-{% if session['role'] == 'standard' %}
+{% if session.get('role') == 'standard' %}
     <!-- Formulario de calificación y comentario -->
     <h3>Deja tu comentario y calificación:</h3>
     <form method="POST" action="{{ url_for('routes.movie_detail', movie_id=movie.id) }}">
@@ -45,6 +47,11 @@
         </select>
         <button type="submit" class="btn btn-primary">Comentar y Calificar</button>
     </form>
+{% else %}
+    <!-- Botón para volver a inicio si el usuario no está registrado -->
+    <a href="{{ url_for('routes.index') }}">
+        <button class="btn btn-primary">Volver a inicio</button>
+    </a>
 {% endif %}
 
 {% endblock %}
