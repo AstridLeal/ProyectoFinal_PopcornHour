@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Película</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Agregar Película</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <label for="title">Título:</label>
+            <input type="text" name="title" required><br>
+        
+            <label for="description">Descripción:</label>
+            <textarea name="description" required></textarea><br>
+        
+            <label for="genre">Género:</label>
+            <input type="text" name="genre" required><br>
+        
+            <label for="year">Año:</label>
+            <input type="number" name="year" required><br>
+        
+            <!-- Campo para ingresar la URL de la imagen -->
+            <label for="image">Imagen (URL):</label>
+            <input type="file" name="image" id="image" required>
+        
+            <button type="submit" class="btn btn-primary">Agregar Película</button>
+        </form>
+
+        <a href="{{ url_for('routes.dashboard') }}" class="btn btn-secondary">Volver</a>
+    </div>
+</body>
+</html>

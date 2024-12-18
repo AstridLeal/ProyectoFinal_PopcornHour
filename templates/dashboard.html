@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Bienvenido, {{ username }}!</h1>
+<h2>Películas</h2>
+<div class="movie-grid">
+    {% for movie in movies %}
+    <div class="movie-card">
+        <img src="{{ movie.image_url }}" alt="{{ movie.title }}" class="movie-image">
+        <div class="movie-info">
+            <h2>{{ movie.title }}</h2>
+            <p>{{ movie.description }}</p>
+            <p><strong>Género:</strong> {{ movie.genre }}</p>
+            <p><strong>Año:</strong> {{ movie.year }}</p>
+        </div>
+        {% if role == 'standard' %}
+        <!-- Mostrar botones solo si el usuario es estándar -->
+        <a href="{{ url_for('routes.movie_detail', movie_id=movie.id) }}" class="btn btn-primary">Calificar</a>
+        <a href="{{ url_for('routes.movie_detail', movie_id=movie.id) }}" class="btn btn-secondary">Comentar</a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+<a href="{{ url_for('routes.logout') }}" class="btn btn-secondary">Cerrar Sesión</a>
