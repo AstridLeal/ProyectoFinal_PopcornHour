@@ -1,7 +1,8 @@
-from flask import Flask
+from flask import Flask, session
 from database import db
 from routes import routes
 from flask_login import LoginManager
+from datetime import timedelta
 
 # Crear una instancia de la app
 app = Flask(__name__)
@@ -9,6 +10,9 @@ app.secret_key = 'supersecretkey123' # Clave secreta para la sesión
 # Configurar Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# Configurar la duración de la cookie de sesión
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7) # Mantener la sesión activa por 7 días
 
 # Importar el modelo User
 from models import User 
@@ -27,6 +31,12 @@ db.init_app(app)
 
 # Registrar el Blueprint de las rutas
 app.register_blueprint(routes)
+
+# Asegurar que la sesión sea permanente
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(days=7)
 
 # Crea todas las tablas (solo si no están creadas aún)
 with app.app_context():

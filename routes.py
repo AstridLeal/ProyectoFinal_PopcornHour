@@ -4,6 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from models import User, Movie, Comment
 from database import db
+from flask_login import login_user, logout_user, current_user
 
 # Crear un Blueprint para las rutas
 routes = Blueprint('routes', __name__)
@@ -57,7 +58,8 @@ def login():
         # Verificar si el usuario existe
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
-            # Guardar datos del usuario en la sesión
+            # Guardar datos del usuario en la sesión y recordar la sesión
+            login_user(user, remember=True)
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = user.role
@@ -72,6 +74,7 @@ def login():
 @routes.route('/logout')
 def logout():
     # Limpiar la sesión del usuario
+    logout_user()
     session.clear()
     flash('Sesión cerrada exitosamente.', 'success')
     return redirect(url_for('routes.index'))
@@ -109,7 +112,7 @@ def add_movie():
 # Dashboard para mostrar las películas y opciones
 @routes.route('/dashboard')
 def dashboard():
-    if 'user_id' not in session:
+    if not current_user.is_authenticated:
         flash('Debes iniciar sesión primero.', 'warning')
         return redirect(url_for('routes.login'))
     # Obtener todas las películas de la base de datos
