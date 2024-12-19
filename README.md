@@ -35,3 +35,10 @@ Popcorn Hour es una aplicación web para recomendar, calificar y discutir sobre 
 
 5. Ejecuta la aplicación:
     python app.py
+
+## Paqueterías necesarias:
+- Flask
+- Flask-Login
+- Flask-SQLAlchemy
+- psycopg2-binary
+- SQLAlchemy
